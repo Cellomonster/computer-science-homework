@@ -70,7 +70,7 @@ string pixelIdToString(int id){
  * Usage: drawScene()
  * ---------------------------------------------------------------------------
  * Clears previous terminal lines and prints scene matrix as a grid of
- * characters. Pauses program for refreshRate nanoseconds */
+ * characters. Pauses program for 'refreshRate' nanoseconds */
 void drawScene(){
   //Clear display (works on Linux + MacOS, but not Windows & etc)
   cout << "\033c" << endl;
@@ -90,8 +90,7 @@ void drawScene(){
  * Fills terrain array with integers that either are the same or have a
  * difference of 1 to the previous value in the array. The first item in the
  * array is always the same as the last value of the array prior to calling
- * generateTerrain().
- * Then, sets anything above */
+ * generateTerrain(). Applies terrain array to scene matrix  */
 void generateTerrain(){
 
   for(int i = 0; i < w; i++){
@@ -161,9 +160,8 @@ public:
     if(velocityY > -3)
       velocityY -= 0.01;
 
-    //Replace last ball pixel with whatever was there before it
-    //  If this isnt done, the ball will form a path where it travels
-    //of ball pixel values. Looks cool, but isnt what golf looks like!
+    //  Replace last ball pixel with whatever was there before it to avoid
+    //trail of "ghost balls" onscreen
     setPixel(x, y, lastPixelValue);
 
     //Apply velocity
@@ -184,7 +182,7 @@ public:
     lastPixelValue = getPixel(x, y);
 
     //  If the pixel bellow the ball is ground,
-    //dont keep falling through it! -A wise man
+    //handle collisions
     if(getPixel(x, y + 1) == 1 && velocityY <= 0){
       //The ball can bounce back up if its falling quick enough
       velocityY = (velocityY < -0.3)? -velocityY / 2 : 0;
@@ -199,7 +197,7 @@ public:
       x = 0;
     }
 
-    //Display the ball. This is important!
+    //Display the ball onscreen
     setPixel(x, y, 2);
   }
 };
