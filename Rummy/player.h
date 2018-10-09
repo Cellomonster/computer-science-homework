@@ -1,13 +1,16 @@
 #ifndef player_h
 #define player_h
 
-class Card{
+#include <vector>
+#include "card.h"
+
+class Player{
 public:
-  int suit_;
-  int value_;
+  const bool bot_;
+	vector<Card> hand;
 
 public:
-  Card(int suit, int value);
+  Player(int suit, int value);
 };
 
 #endif
