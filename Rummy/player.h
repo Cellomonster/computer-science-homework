@@ -3,14 +3,34 @@
 
 #include <vector>
 #include "card.h"
+#include "rummy.h"
+using namespace std;
 
 class Player{
-public:
-  const bool bot_;
-	vector<Card> hand;
+private:
+	int isBot_;
+	vector<Card> hand_;
+	Card cardNecessaryToPlay_;
+	bool mustPlayParticularCard_ = false;
 
 public:
-  Player(int suit, int value);
+	Player(bool b);
+
+	void makeTurn();
+	void takeCard(Card card);
+
+private:
+	void displayTable();
+	void displayHand();
+
+	void drawCards();
+	void playCards();
+
+	void buildMeld();
+	void addToMeld();
+
+	bool checkIfCardIsPlayable(Card card);
+	void discardCard(int n);
 };
 
 #endif
