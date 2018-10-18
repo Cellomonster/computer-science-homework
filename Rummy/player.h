@@ -1,17 +1,33 @@
+/*
+File: player.h
+-----------------
+Player class.
+Manages and limits player's actions.
+
+Author: Julian Triveri
+10/08/18
+*/
+
 #ifndef player_h
 #define player_h
 
 #include <vector>
 #include "card.h"
+//#include "playerAI.h"
 #include "rummy.h"
 using namespace std;
 
+/* Class: Player
+ * ---------------------------------------------------------------------------
+ * Represents a human or computer player. Handles player actions */
 class Player{
 private:
-	int isBot_;
+	bool isBot_;
+	string botActionHistory_;
 	vector<Card> hand_;
 	Card cardNecessaryToPlay_;
 	bool mustPlayParticularCard_ = false;
+	//AI ai;
 
 public:
 	Player(bool b);
@@ -26,10 +42,13 @@ private:
 	void drawCards();
 	void playCards();
 
+	void drawFromDeck();
+	void drawFromDiscardPile(int n);
+
 	void buildMeld();
 	void addToMeld();
 
-	bool checkIfCardIsPlayable(Card card);
+	bool checkIfCardIsPlayable(Card card, int cardsToConsiderFromDiscardPile);
 	void discardCard(int n);
 };
 

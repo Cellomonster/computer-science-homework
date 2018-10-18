@@ -1,3 +1,13 @@
+/*
+File: card.h
+-----------------
+Card struct.
+(Card is a struct rather than a class because lack of any need for private variables)
+
+Author: Julian Triveri
+10/08/18
+*/
+
 #ifndef card_h
 #define card_h
 
