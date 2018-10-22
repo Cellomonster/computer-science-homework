@@ -21,17 +21,20 @@ using namespace std;
  * Represents a meld of cards. Handles checking and adding of cards*/
 class Meld{
 public:
+	Meld(int t = 0);
 	vector<Card> cards;
+
+private:
 	int type;
 
 public:
 
 	bool addCard(Card card);
+	void addCard_(Card card);
 	int checkIfCompatible(Card card);
 
 private:
 	int checkCardBySuitSeries_(Card card);
-	void addCard_(Card card);
 };
 
 #endif

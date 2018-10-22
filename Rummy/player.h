@@ -23,11 +23,12 @@ using namespace std;
 class Player{
 private:
 	bool isBot_;
+	Card cardNecessaryToPlay_;
+	int typeOfMeldToBuild_;
+	bool mustPlayParticularCard_ = false;
+
 	string botActionHistory_;
 	vector<Card> hand_;
-	Card cardNecessaryToPlay_;
-	bool mustPlayParticularCard_ = false;
-	//AI ai;
 
 public:
 	Player(bool b);
@@ -36,11 +37,13 @@ public:
 	void takeCard(Card card);
 
 private:
+
 	void displayTable();
 	void displayHand();
 
 	void drawCards();
 	void playCards();
+	void aiPlayCard(Card card);
 
 	void drawFromDeck();
 	void drawFromDiscardPile(int n);
@@ -48,8 +51,12 @@ private:
 	void buildMeld();
 	void addToMeld();
 
-	bool checkIfCardIsPlayable(Card card, int cardsToConsiderFromDiscardPile);
-	void discardCard(int n);
+	int checkIfCardIsPlayable(Card card, int cardsToConsiderFromDiscardPile);
+	int checkIfCardIsPlayable(Card card);
+	void removeCard(Card card);
+	void removeCard(int n);
+
+	void clearDisplay();
 };
 
 #endif

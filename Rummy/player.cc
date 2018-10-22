@@ -18,7 +18,6 @@ Author: Julian Triveri
 
 #include "card.h"
 #include "rummy.h"
-//#include "playerAI.h"
 #include "player.h"
 using namespace std;
 
@@ -27,7 +26,6 @@ string notification;
 
 void displayCardPile(vector<Card> pile);
 void displayMelds();
-void clearDisplay();
 void displayNotification();
 
 bool checkIfNumber(string s);
@@ -108,27 +106,32 @@ void Player::drawCards(){
 			int cardsToTake = 0;
 			int nonPlayableCards = 0;
 
-			for(int i = 1 i <= discardPile.size(); i++){
-				if(checkIfCardIsPlayable(discardPile[discardPile.size() - i]))
+			for(int i = 1; i <= discardPile.size(); i++){
+				int checkResult = checkIfCardIsPlayable(discardPile[discardPile.size() - i]);
+				if(checkResult){
+					typeOfMeldToBuild_ = checkResult;
 					cardsToTake = i;
-				else
-					nonPlayableCards++;
+				}else nonPlayableCards++;
 
 				if(nonPlayableCards >= 2)
 					break;
 			}
 
-			if(cardsToTake > 0)
+			if(cardsToTake > 0){
 				drawFromDiscardPile(cardsToTake);
 				displayTable();
-				cout << "Bot drew " << cardsToTake << " card" << (cardsToTake > 1)? "s" : "" << " from the discard pile" << endl;
+				cout << "Bot drew " << cardsToTake << " card" << ((cardsToTake > 1)? "s" : "") << " from the discard pile" << endl;
 				break;
-			else{
+			}else{
 				drawFromDeck();
 				displayTable();
 				cout << "Bot drew a card from the deck" << endl;
 				break;
 			}
+
+			//Robots always like to keep everything neat and in order
+			//(also important to keep sorted for building melds)
+			sort(hand_.begin(), hand_.end(), compareValue);
 		}
 }
 
@@ -151,46 +154,122 @@ void Player::drawFromDiscardPile(int n){
  * discard pile and new/existing melds */
 void Player::playCards(){
 	if(!isBot_)
-	while(true){
-		displayTable();
+		//Human player
+		while(true){
+			displayTable();
 
-		//Player choices
-		if(mustPlayParticularCard_)								cout << "!! You must play a " << cardNecessaryToPlay_.toString() << " !!" << endl;
-		if(hand_.size() > 3)											cout << "build ------ build a meld" << endl;
-		if(melds.size())													cout << "add -------- add cards to melds" << endl;
-																							cout << "sort ------- sort the cards in your hand" << endl;
-		if(!mustPlayParticularCard_)							cout << "<number> --- discard a card and end your turn" << endl;
+			//Player choices
+			if(mustPlayParticularCard_)								cout << "!! You must play a " << cardNecessaryToPlay_.toString() << " !!" << endl;
+			if(hand_.size() > 3)											cout << "build ------ build a meld" << endl;
+			if(melds.size())													cout << "add -------- add cards to melds" << endl;
+																								cout << "sort ------- sort the cards in your hand" << endl;
+			if(!mustPlayParticularCard_)							cout << "<number> --- discard a card and end your turn" << endl;
 
-		string argument;
-		cin >> argument;
+			string argument;
+			cin >> argument;
 
-		//Build meld
-		if(hand_.size() > 3 && argument == "build") buildMeld();
+			//Build meld
+			if(hand_.size() > 3 && argument == "build") buildMeld();
 
-		//Add to existing melds
-		else if(melds.size() > 0 && argument == "add") addToMeld();
+			//Add to existing melds
+			else if(melds.size() > 0 && argument == "add") addToMeld();
 
-		//Sort hand
-		//(This could be done automatically, but to make the game seem a tad bit
-		//more authentic, I decided to make it manual, like a player would
-		//sometimes rearrange his hand)
-		else if(argument == "sort") sort(hand_.begin(), hand_.end(), compareValue);
+			//Sort hand
+			//(This could be done automatically, but to make the game seem a tad bit
+			//more authentic, I decided to make it manual, like a player would
+			//sometimes rearrange his hand)
+			else if(argument == "sort") sort(hand_.begin(), hand_.end(), compareValue);
 
-		//Discard card
-		else if(!mustPlayParticularCard_ && checkIfNumber(argument)){
-			int cardIndex = stoi(argument);
+			//Discard card
+			else if(!mustPlayParticularCard_ && checkIfNumber(argument)){
+				int cardIndex = stoi(argument);
 
-			if(cardIndex < hand_.size()){
-				discardPile.push_back(hand_[cardIndex]);
-				discardCard(cardIndex);
-				break;
-			}else notification = "That isn't a valid card number!";
+				if(cardIndex < hand_.size()){
+					discardPile.push_back(hand_[cardIndex]);
+					removeCard(cardIndex);
+					break;
+				}else notification = "That isn't a valid card number!";
 
+			}
+
+			else notification = "That isn't a valid argument!";
+		}else{
+			if(mustPlayParticularCard_){
+				aiPlayCard(cardNecessaryToPlay_);
+				mustPlayParticularCard_ = false;
+			}
+
+			for(Card card : hand_)
+				if(hand_.size() > 1)
+					aiPlayCard(card);
+				else break;
+
+			discardPile.push_back(hand_[0]);
+			removeCard(0);
+		}
+}
+
+void Player::aiPlayCard(Card cardToPlay){
+	switch(checkIfCardIsPlayable(cardToPlay)){
+		case 0:
+		break;
+
+		case 1: {
+			Meld meld = Meld(1);
+			meld.addCard(cardToPlay);
+
+			for(Card card : hand_){
+				if(card.suit != cardToPlay.suit && card.value == cardToPlay.value){
+					meld.addCard_(card);
+					removeCard(card);
+				}
+				else if(card.value > cardToPlay.value) break;
+			}
+
+			removeCard(cardToPlay);
+			break;
+		}
+		
+		case 2: {
+			Meld meld = Meld(2);
+			int cardIndex = distance(hand_.begin(), find(hand_.begin(), hand_.end(), cardToPlay));
+			vector<int> cardsToRemove;
+
+			for(int i = cardIndex - 1; i > 0; i--){
+				if(hand_[i].suit == cardToPlay.suit && hand_[i].value == hand_[i + 1].value - 1){
+					meld.addCard_(hand_[i]);
+					cardsToRemove.push_back(i);
+				}else break;
+			}
+
+			for(int i = cardIndex + 1; i < hand_.size(); i++){
+				if(hand_[i].suit == cardToPlay.suit && hand_[i].value == hand_[i - 1].value + 1){
+					meld.addCard_(hand_[i]);
+					cardsToRemove.push_back(i);
+				}else break;
+			}
+
+			removeCard(cardToPlay);
+			sort(cardsToRemove.begin(), cardsToRemove.end());
+			for(int i = cardsToRemove.size() - 1; i > 0; i--){
+				removeCard(cardsToRemove[i]);
+			}
+
+			break;
 		}
 
-		else notification = "That isn't a valid argument!";
 
-	}
+		case 3: {
+			for(Meld meld : melds){
+				if(meld.addCard(cardToPlay)){
+					removeCard(cardToPlay);
+					mustPlayParticularCard_ = false;
+					break;
+				}
+			}
+			break;
+		}
+	};
 }
 
 /* Function: buildMeld
@@ -250,7 +329,7 @@ void Player::buildMeld(){
 				aboutToPlayNecessaryCard = true;
 
 			if(buildingMeld.addCard(hand_[cardIndex]))
-				discardCard(cardIndex);
+				removeCard(cardIndex);
 			else
 				notification = "You can't add that card to this meld!";
 		}
@@ -266,7 +345,6 @@ void Player::buildMeld(){
  * Handles non-computer player's actions in respect to adding cards to existing
  * melds */
 void Player::addToMeld(){
-
 	while(true){
 		clearDisplay();
 		displayMelds();
@@ -289,7 +367,7 @@ void Player::addToMeld(){
 					if(hand_[cardNumber].suit == cardNecessaryToPlay_.suit && hand_[cardNumber].value == cardNecessaryToPlay_.value)
 						mustPlayParticularCard_ = false;
 
-					discardCard(cardNumber);
+					removeCard(cardNumber);
 				}else notification = "That card doesn't belong in that meld!";
 			else notification = "That isn't a valid card/meld number!";
 
@@ -301,17 +379,66 @@ void Player::addToMeld(){
 }
 
 /* Function: checkIfCardIsPlayable
+ * Usage: checkIfCardIsPlayable(<card to check>)
+ * ---------------------------------------------------------------------------
+ * Checks wether or not it is possible to play a given card from the player's hand */
+int Player::checkIfCardIsPlayable(Card card){
+
+	//Check if card fits into any melds
+	for(Meld meld : melds)
+		if(meld.checkIfCompatible(card))
+			return 3;
+
+	//If not, check for potential melds
+
+	//Count consecutive cards of a suit
+	int suitSeriesCount;
+	//Used to find consecutive cards in a suit
+	int suitSeriesMin = card.value - 1;
+	int suitSeriesMax = card.value + 1;
+	//Count cards of the same values
+	int valueCount;
+
+	//Combine hand and cards being drawn from discard pile into a single vector
+	//to check through
+	vector<Card> consideredCards =  hand_;
+	//To prevent possible issues with finding consecutive cards
+	sort(consideredCards.begin(), consideredCards.end(), compareValue);
+
+	for(Card consideredCard : consideredCards){
+		//Don't check the card being checked for playability against itself
+		if(addressof(card) != addressof(consideredCard)){
+			//Same value
+			if(consideredCard.value == card.value);
+				valueCount++;
+
+			//Consecutive value, same suit
+			if(consideredCard.suit == card.suit && (consideredCard.value == suitSeriesMin || consideredCard.value == suitSeriesMax)){
+				suitSeriesCount ++;
+				(consideredCard.value == suitSeriesMin)? suitSeriesMin-- : card.value == suitSeriesMax++;
+			}
+
+			//If either > 2, the card being checked can be played in a new meld
+			if(suitSeriesCount > 2 || valueCount > 2)
+				return (valueCount > 2)? 1 : 2;
+		}
+	}
+
+	return false;
+}
+
+/* Function: checkIfCardIsPlayable
  * Usage: checkIfCardIsPlayable(<card to check>, <cards from the end of the
  * 	discard pile to consider>)
  * ---------------------------------------------------------------------------
  * Checks wether or not it is possible to play a given card, considering both
  * existing and future melds */
-bool Player::checkIfCardIsPlayable(Card card, int cardsToConsiderFromDiscardPile){
+int Player::checkIfCardIsPlayable(Card card, int cardsToConsiderFromDiscardPile){
 
 	//Check if card fits into any melds
 	for(Meld meld : melds)
 		if(meld.checkIfCompatible(card))
-			return true;
+			return 3;
 
 	//If not, check for potential melds
 
@@ -347,18 +474,30 @@ bool Player::checkIfCardIsPlayable(Card card, int cardsToConsiderFromDiscardPile
 
 			//If either > 2, the card being checked can be played in a new meld
 			if(suitSeriesCount > 2 || valueCount > 2)
-				return true;
+				return (valueCount > 2)? 1 : 2;
 		}
 	}
 
 	return false;
 }
 
-/* Function: discardCard
- * Usage: discardCard(<index of card>)
+/* Function: removeCard
+ * Usage: removeCard(<card>)
+ * ---------------------------------------------------------------------------
+ * Removes card from the player hand */
+void Player::removeCard(Card card){
+	for(int i = 0; i < hand_.size(); i++)
+		if(hand_[i].suit == card.suit && hand_[i].value == card.value){
+			removeCard(i);
+			break;
+		}
+}
+
+/* Function: removeCard
+ * Usage: removeCard(<index of card>)
  * ---------------------------------------------------------------------------
  * Removes a card at index *n* from the player hand */
-void Player::discardCard(int n){
+void Player::removeCard(int n){
 	hand_.erase(hand_.begin() + n);
 }
 
@@ -389,6 +528,8 @@ void Player::displayTable(){
 		cout << endl << endl;
 		cout << "It's your turn!" << endl;
 		cout << endl << endl;
+	}else{
+		cout << botActionHistory_ << endl;
 	}
 }
 
@@ -463,12 +604,12 @@ bool compareValue(Card a, Card b){
  * Usage: clearDisplay()
  * ---------------------------------------------------------------------------
  * Clears the terminal window  */
-void clearDisplay(){
+void Player::clearDisplay(){
 	//Only works on unix-like OSs
 	cout << "\033[2J";
 
 	//Print notification string at the top
-	if(notification != ""){
+	if(!isBot_ && notification != ""){
 		cout << "!! " << notification << " !!" << endl;
 		notification = "";
 	}

@@ -16,6 +16,10 @@ Author: Julian Triveri
 #include "rummy.h"
 using namespace std;
 
+Meld::Meld(int t){
+	type = t;
+}
+
 /* Function: addCard
  * Usage: addCard(<card>)
  * Returns: true if the card is added, false if not
