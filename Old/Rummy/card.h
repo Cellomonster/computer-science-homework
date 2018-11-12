@@ -25,6 +25,14 @@ struct Card{
 
 		return "[" + suitIcons[suit] + " " + values[value] + "]";
 	};
+
+	bool operator==(Card card){
+		return (card.suit == suit && card.value == value);
+	}
+
+	bool operator!=(Card card){
+		return (card.suit != suit || card.value != value);
+	}
 };
 
 #endif

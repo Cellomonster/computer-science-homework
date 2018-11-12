@@ -121,27 +121,11 @@ void selectionSort ( int array[], int n )
 //   - index of target value
 //=============================================================
 
-int binarySearch ( int array[], int n, int t){
-
-  cout << array[n / 2] << endl;
-
-  for(int i = 0; i < n; i++){
-    cout << array[i] << " ";
-  }
-
-  cout << endl;
-
-  if(array[n / 2] == t) return n;
-
-  if(n < 2) return -1;
-
-  int trimmedArray[n / 2];
-  int halfOffset = (array[n / 2] > t)? 0 : n / 2;
-
-  for(int i = 0; i < n / 2; i++)
-    trimmedArray[i] = array[halfOffset + i];
-
-  return binarySearch(trimmedArray, n / 2, t);
+int binarySearch(string key, Vector<string> &vec, int p1, int p2){
+    if(p1 > p2) return -1;
+    int mid = (p1+p2)/2;
+    if(key == vec[mid]) return mid;
+    if(key < )
 }
 
 //=============================================================

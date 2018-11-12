@@ -24,7 +24,6 @@ class Player{
 private:
 	bool isBot_;
 	Card cardNecessaryToPlay_;
-	int typeOfMeldToBuild_;
 	bool mustPlayParticularCard_ = false;
 
 	string botActionHistory_;
@@ -43,7 +42,7 @@ private:
 
 	void drawCards();
 	void playCards();
-	void aiPlayCard(Card card);
+	void aiPlayCard(int cardIndex);
 
 	void drawFromDeck();
 	void drawFromDiscardPile(int n);
@@ -51,8 +50,8 @@ private:
 	void buildMeld();
 	void addToMeld();
 
-	int checkIfCardIsPlayable(Card card, int cardsToConsiderFromDiscardPile);
-	int checkIfCardIsPlayable(Card card);
+	bool checkIfCardIsPlayable(Card card, int cardsToConsiderFromDiscardPile);
+	void aiPlayCard(Card card);
 	void removeCard(Card card);
 	void removeCard(int n);
 
