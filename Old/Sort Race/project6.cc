@@ -120,8 +120,9 @@ int main(){
 
 /* Function: selectionSort
  * Usage: selectionSort(<vector>)
+ * Parameters: vector to sort
  * ---------------------------------------------------------------------------
- * Sorts a vector of long ints with the selection sort algorithm */
+ * Sorts a vector of long ints using a selection sort algorithm */
 void selectionSort(vector<long int> & v){
 	for(long int i = 0; i < v.size() - 1; i++){
 		long int lowestIndex = i;
@@ -136,21 +137,23 @@ void selectionSort(vector<long int> & v){
 
 /* Function: insertionSort
  * Usage: insertionSort(<vector>)
+ * Parameters: vector to sort
  * ---------------------------------------------------------------------------
- * Sorts a vector of long ints with the insertion sort algorithm */
+ * Sorts a vector of long ints using a insertion sort algorithm */
 void insertionSort(vector<long int> & v) { 
 	for (long int i = 1; i < v.size(); i++){
 		long int j = i - 1;
 		
 		while (j >= 0 && v[j] > v[i]) j = j - 1;
-		rotate(v.begin() + j + 1, v.begin() + i, v.begin() + i + 1);
+			rotate(v.begin() + j + 1, v.begin() + i, v.begin() + i + 1);
 	}
 }
 
 /* Function: mergeSort
- * Usage: mergeSort(<vector>, <left slice>, <right slice>)
+ * Usage: mergeSort(<vector>, <int>, <int>)
+ * Parameters: vector to sort, left slice, right slice
  * ---------------------------------------------------------------------------
- * Sorts a vector of long ints with the merge sort algorithm */
+ * Sorts a vector of long ints using a merge sort algorithm */
 void mergeSort(vector<long int> & v, long int l, long int r) { 
 	if(l>=r) return;
 
@@ -197,9 +200,10 @@ void mergeSort(vector<long int> & v, long int l, long int r) {
 }
 
 /* Function: quickSort
- * Usage: quickSort(<vector>, <start boundary>, <finish boundary>)
+ * Usage: quickSort(<vector>, <int>, <int>)
+ * Parameters: vector to sort, start boundary, finish boundary
  * ---------------------------------------------------------------------------
- * Sorts a vector of long ints with the quicksort algorithm */
+ * Sorts a vector of long ints using a quicksort algorithm */
 void quickSort(vector<long int> & v, long int s, long int f){
 	if(s >= f) return;
 
@@ -228,7 +232,8 @@ void quickSort(vector<long int> & v, long int s, long int f){
 }
 
 /* Function: runTest
- * Usage: runTest(<vector size>, <algorithm type>, <number of trials>)
+ * Usage: runTest(<int>, <int>, <int>)
+ * Parameters: length of vector, type of vector to test, number of trials
  * ---------------------------------------------------------------------------
  * Run n time trials for t sorting algorithm on a vector with vectorSize elements */
 void runTest(long int vectorSize, int t, int n){

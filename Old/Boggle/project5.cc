@@ -45,6 +45,7 @@ void generateBoggle();
 bool readDictionary();
 void findWord(pos position, vector<pos> visited, string found, string target);
 
+/* Main function */
 int main(void){
 
 	readDictionary();
@@ -90,6 +91,7 @@ void generateBoggle(){
 
 /* Function: readDictionary
  * Usage: readDictionary()
+ * Returns: wether or not the dictionary of words was succesfully read
  * ---------------------------------------------------------------------------
  * Reads content of words.txt and stores each line as a value in the words deque
  */
@@ -132,8 +134,8 @@ bool readDictionary() {
 }
 
 /* Function: findWord
- * Usage: findWord(pos <position on board>, vector<pos> <previously used dice>,
- * string <currently found string>, string <word to find>)
+ * Usage: findWord(<pos>, <vector<pos>>, <string>, <string>)
+ * Parameters: position on the board to check, positions already checked, current string formed, target word to find
  * ---------------------------------------------------------------------------
  * Recursively searches for a given word on the board. If it is found on the
  * board, the word is added to the wordsFound vector
@@ -145,7 +147,7 @@ void findWord(pos position, vector<pos> visited, string found, string target){
 	//Add this die character to the found string
 	found += boggle[position.y][position.x];
 
-	//If the word found is longer than 3 characters, is equal to the target word,
+	//If the word found is equal to or longer than 3 characters, is equal to the target word,
 	//and was not found before, add it to the vector of found words
 	if(found.length() >= 3 && target == found && find(wordsFound.begin(), wordsFound.end(), found) == wordsFound.end()){
 		wordsFound.push_back(found);

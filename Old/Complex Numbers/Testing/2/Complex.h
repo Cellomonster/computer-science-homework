@@ -35,9 +35,6 @@ public:
 	void setReal(float);
 	void setImag(float);
 
-	//Copy operator
-	void operator=(const Complex&);
-
 	//Comparison operators
 	bool operator==(const Complex&);
 	bool operator!=(const Complex&);
@@ -64,24 +61,24 @@ public:
 
 };
 
-//Stream operator
-std::ostream& operator<<(std::ostream& os, const Complex&);
+// //Stream operator
+// std::ostream& operator<<(std::ostream& os, const Complex&);
 
-//Math operators: complex on complex
-Complex operator+(const Complex&, const Complex&);
-Complex operator-(const Complex&, const Complex&);
-Complex operator*(const Complex&, const Complex&);
-Complex operator/(const Complex&, const Complex&);
+// //Math operators: complex on complex
+// Complex operator+(const Complex&, const Complex&);
+// Complex operator-(const Complex&, const Complex&);
+// Complex operator*(const Complex&, const Complex&);
+// Complex operator/(const Complex&, const Complex&);
 
-//Math operators: float on complex
-Complex operator+(const Complex&, const float&);
-Complex operator-(const Complex&, const float&);
-Complex operator*(const Complex&, const float&);
-Complex operator/(const Complex&, const float&);
+// //Math operators: float on complex
+// Complex operator+(const Complex&, const float&);
+// Complex operator-(const Complex&, const float&);
+// Complex operator*(const Complex&, const float&);
+// Complex operator/(const Complex&, const float&);
 
-//Math operators: etc
-Complex operator-(const Complex&);
-Complex operator~(const Complex&);
-Complex operator^(const Complex&, const int&);
+// //Math operators: etc
+// Complex operator-(const Complex&);
+// Complex operator~(const Complex&);
+// Complex operator^(const Complex&, const int&);
 
 #endif

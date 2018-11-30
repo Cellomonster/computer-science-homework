@@ -43,13 +43,6 @@ float Complex::getImag() const{return i;};
 void Complex::setReal(float f){this->r = f;};
 void Complex::setImag(float f){this->i = f;};
 
-//Operator: c = <complex>
-//Sets values of the complex number equal to another
-void Complex::operator=(const Complex &c){
-	r = c.getReal();
-	i = c.getImag();
-}
-
 //Operator: c == <complex>
 //Compares the complex number to another for equal values
 bool Complex::operator==(const Complex &c){
